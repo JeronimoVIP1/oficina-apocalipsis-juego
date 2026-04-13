@@ -29,6 +29,202 @@
 <link rel="apple-touch-icon" href="logo.png">
 
 <title>Oficina del Apocalipsis — Juego Multijugador de Zombies Online Gratis</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+// --- CONFIGURACIÓN DE FIREBASE ---
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-Uos_u6FD2dw4Kf_qlgJSOm8pliL0Tg",
+  authDomain: "oficina-del-apocalipsis.firebaseapp.com",
+  projectId: "oficina-del-apocalipsis",
+  storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
+  messagingSenderId: "211439249979",
+  appId: "1:211439249979:web:3b0fbcdcdcfc3e8b028a1e",
+  measurementId: "G-HM0NSL16S5"
+};
+
+
+// INICIALIZACIÓN DE SERVICIOS
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+console.log("Firebase inicializado con éxito.");
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js">
+// --- CONFIGURACIÓN DE FIREBASE ---
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-Uos_u6FD2dw4Kf_qlgJSOm8pliL0Tg",
+  authDomain: "oficina-del-apocalipsis.firebaseapp.com",
+  projectId: "oficina-del-apocalipsis",
+  storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
+  messagingSenderId: "211439249979",
+  appId: "1:211439249979:web:3b0fbcdcdcfc3e8b028a1e",
+  measurementId: "G-HM0NSL16S5"
+};
+
+
+// INICIALIZACIÓN DE SERVICIOS
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+console.log("Firebase inicializado con éxito.");
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+// --- CONFIGURACIÓN DE FIREBASE ---
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-Uos_u6FD2dw4Kf_qlgJSOm8pliL0Tg",
+  authDomain: "oficina-del-apocalipsis.firebaseapp.com",
+  projectId: "oficina-del-apocalipsis",
+  storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
+  messagingSenderId: "211439249979",
+  appId: "1:211439249979:web:3b0fbcdcdcfc3e8b028a1e",
+  measurementId: "G-HM0NSL16S5"
+};
+
+
+// INICIALIZACIÓN DE SERVICIOS
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+console.log("Firebase inicializado con éxito.");
+
+</script>
+
+<style>
+/* ══════════════════════════════════════
+   SISTEMA GLOBAL: LOGIN, MENU PRINCIPAL, TIENDA, CHAT
+══════════════════════════════════════ */
+
+/* ── LOGIN ── */
+#loginScreen {
+  position:fixed; inset:0; z-index:1000;
+  background:radial-gradient(ellipse at 50% 40%,#1c0a2e 0%,#0d0d0d 70%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:16px; font-family:'Courier New',monospace;
+}
+#loginScreen h1 { font-size:40px; color:#ff3333; letter-spacing:3px; text-align:center; }
+#loginScreen p  { color:#888; font-size:13px; letter-spacing:1px; }
+.login-btn {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 28px; background:#fff; border:none; border-radius:0;
+  font-size:15px; font-weight:bold; cursor:pointer; letter-spacing:1px;
+  color:#333; font-family:'Courier New',monospace;
+}
+.login-btn:hover { background:#eee; }
+.login-btn img { width:22px; height:22px; }
+
+/* ── MENÚ PRINCIPAL ── */
+#mainMenu {
+  position:fixed; inset:0; z-index:900;
+  background:#0d0d0d; display:none;
+  flex-direction:column; align-items:center;
+  font-family:'Courier New',monospace; color:#fff; overflow-y:auto;
+}
+#mainMenuTop {
+  width:100%; max-width:800px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px; border-bottom:1px solid #222;
+}
+#userAvatar { width:36px; height:36px; border-radius:0; border:2px solid #ffcc44; }
+#userNameDisplay { color:#ffcc44; font-size:14px; font-weight:bold; }
+#jcPlusDisplay { color:#ff88ff; font-size:13px; font-weight:bold; }
+.menu-tabs {
+  display:flex; gap:0; border-bottom:2px solid #222;
+  width:100%; max-width:800px;
+}
+.menu-tab {
+  flex:1; padding:12px; background:#111; border:none; color:#666;
+  font-family:'Courier New',monospace; font-size:12px; font-weight:bold;
+  cursor:pointer; letter-spacing:1px; border-bottom:3px solid transparent;
+}
+.menu-tab.active { color:#ffcc44; border-bottom-color:#ffcc44; background:#1a1a1a; }
+.menu-panel { display:none; width:100%; max-width:800px; padding:16px; }
+.menu-panel.active { display:block; }
+
+/* ── TIENDA GENERAL ── */
+.skin-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:12px; padding:8px 0;
+}
+.skin-card {
+  background:#1a1a2e; border:2px solid #333; padding:10px;
+  text-align:center; cursor:pointer; transition:border-color 0.2s;
+}
+.skin-card:hover { border-color:#ffcc44; }
+.skin-card.owned { border-color:#44ff88; }
+.skin-card.equipped { border-color:#ff88ff; background:#2a1a3a; }
+.skin-canvas { width:80px; height:80px; display:block; margin:0 auto 6px; }
+.skin-name { font-size:10px; color:#ccc; margin-bottom:4px; }
+.skin-price { font-size:11px; color:#ff88ff; font-weight:bold; }
+.skin-price.owned { color:#44ff88; }
+
+/* ── AMIGOS ── */
+.friend-item {
+  display:flex; align-items:center; gap:10px; padding:10px;
+  background:#1a1a2e; border:1px solid #333; margin-bottom:8px;
+}
+.friend-avatar { width:32px; height:32px; border:2px solid #444; }
+.friend-name { flex:1; font-size:13px; color:#ccc; }
+.friend-status { font-size:10px; }
+.friend-status.online { color:#44ff88; }
+.friend-status.offline { color:#666; }
+.btn-sm {
+  padding:4px 10px; background:#1a1a2e; border:1px solid #555;
+  color:#ccc; font-family:'Courier New',monospace; font-size:11px;
+  cursor:pointer; letter-spacing:0.5px;
+}
+.btn-sm:hover { border-color:#ffcc44; color:#ffcc44; }
+.btn-sm.green { border-color:#44ff88; color:#44ff88; }
+.btn-sm.red   { border-color:#ff4444; color:#ff4444; }
+
+/* ── CHAT EN PARTIDA ── */
+#chatBox {
+  position:fixed; bottom:0; right:0; width:240px;
+  background:rgba(0,0,0,0.85); border-left:1px solid #333; border-top:1px solid #333;
+  display:none; flex-direction:column; z-index:50; font-family:'Courier New',monospace;
+}
+#chatMessages {
+  height:140px; overflow-y:auto; padding:6px 8px; font-size:11px;
+  display:flex; flex-direction:column; gap:3px;
+}
+.chat-msg { color:#ccc; line-height:1.4; }
+.chat-msg span { font-weight:bold; }
+#chatInputRow { display:flex; border-top:1px solid #333; }
+#chatInput {
+  flex:1; background:#111; border:none; color:#fff; padding:5px 8px;
+  font-family:'Courier New',monospace; font-size:11px; outline:none;
+}
+#chatSendBtn {
+  padding:5px 8px; background:#ffcc44; border:none; color:#000;
+  font-family:'Courier New',monospace; font-size:11px; cursor:pointer; font-weight:bold;
+}
+
+/* ── NOTIFICACIONES ── */
+#notifBadge {
+  position:fixed; top:10px; left:50%; transform:translateX(-50%);
+  background:#ff4444; color:#fff; padding:8px 20px;
+  font-family:'Courier New',monospace; font-size:12px; font-weight:bold;
+  z-index:500; display:none; letter-spacing:1px;
+}
+
+/* ── CÓDIGOS TIENDA ── */
+#storeCodesPanel { padding:16px; }
+.code-active-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; background:#1a1a2e; border:1px solid #333; margin-bottom:6px;
+}
+</style>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
@@ -416,29 +612,6 @@ body {
 </style>
 </head>
 <body>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDt-3o6_UtR6f2oWdT_4jgF50Hp1Ii1otg",
-    authDomain: "oficina-del-apocalipsis.firebaseapp.com",
-    projectId: "oficina-del-apocalipsis",
-    storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
-    messagingSenderId: "211439249979",
-    appId: "1:211439249979:web:3b0bfbcdcd9c3e86b28a1e",
-    measurementId: "G-MBN95L1606"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 
 <!-- SEO: contenido indexable por Google, oculto visualmente -->
 <div style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">
@@ -446,6 +619,120 @@ body {
   <img src="logo.png" alt="Oficina del Apocalipsis juego multijugador zombies online gratis" width="200">
   <p>Juego multijugador online de supervivencia contra zombies. Juega gratis con amigos desde el navegador. Crea una sala, comparte el código y sobrevive juntos contra hordas de zombies en 25 niveles.</p>
 </div>
+
+<!-- ══ PANTALLA DE LOGIN ══ -->
+<div id="loginScreen">
+  <span style="font-size:60px">☕💀</span>
+  <h1>OFICINA<br>DEL APOCALIPSIS</h1>
+  <p>Inicia sesión para guardar tu progreso y jugar online</p>
+  <button class="login-btn" id="btnGoogleLogin">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Entrar con Google
+  </button>
+  <p style="color:#444;font-size:10px;margin-top:8px;">Se requiere cuenta de Google</p>
+</div>
+
+<!-- ══ MENÚ PRINCIPAL ══ -->
+<div id="mainMenu">
+  <div id="mainMenuTop">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <img id="userAvatar" src="" alt="">
+      <div>
+        <div id="userNameDisplay">—</div>
+        <div id="jcPlusDisplay">0 JC+</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-sm" id="btnLogout">Salir</button>
+    </div>
+  </div>
+
+  <div class="menu-tabs">
+    <button class="menu-tab active" onclick="switchMenuTab('jugar')">🎮 JUGAR</button>
+    <button class="menu-tab" onclick="switchMenuTab('tienda')">🛍️ TIENDA</button>
+    <button class="menu-tab" onclick="switchMenuTab('amigos')">👥 AMIGOS</button>
+    <button class="menu-tab" onclick="switchMenuTab('codigos')">🔑 CÓDIGOS</button>
+  </div>
+
+  <!-- PESTAÑA JUGAR -->
+  <div class="menu-panel active" id="tab-jugar">
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:50px;margin-bottom:10px;">☕💀</div>
+      <h2 style="color:#ffcc44;letter-spacing:2px;margin-bottom:20px;">OFICINA DEL APOCALIPSIS</h2>
+      <button class="login-btn" style="background:#ff3333;color:#fff;margin:0 auto 10px;display:flex;" onclick="irAJugar()">▶ JUGAR</button>
+      <div style="color:#444;font-size:11px;margin-top:16px;">
+        JeroCoins de partida no se guardan · JC+ se guardan siempre
+      </div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA TIENDA -->
+  <div class="menu-panel" id="tab-tienda">
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button class="btn-sm active" id="tbtnPersonaje" onclick="switchSkinTab('personaje')" style="border-color:#ffcc44;color:#ffcc44;">👤 Personaje</button>
+      <button class="btn-sm" id="tbtnTaza" onclick="switchSkinTab('taza')">☕ Taza</button>
+    </div>
+    <div id="skinGrid" class="skin-grid"><!-- JS --></div>
+  </div>
+
+  <!-- PESTAÑA AMIGOS -->
+  <div class="menu-panel" id="tab-amigos">
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input id="addFriendInput" placeholder="Email del amigo..." style="flex:1;padding:8px;background:#1a1a2e;border:1px solid #444;color:#fff;font-family:'Courier New',monospace;font-size:12px;outline:none;">
+      <button class="btn-sm green" onclick="enviarSolicitud()">+ Añadir</button>
+    </div>
+    <div id="solicitudesContainer"></div>
+    <div style="color:#666;font-size:10px;margin:8px 0 6px;letter-spacing:1px;">MIS AMIGOS</div>
+    <div id="amigosContainer"></div>
+    <!-- Enviar JC+ -->
+    <div id="enviarJCPanel" style="display:none;background:#1a1a2e;border:1px solid #333;padding:12px;margin-top:10px;">
+      <div style="color:#ff88ff;font-size:12px;margin-bottom:8px;">Enviar JC+ a <span id="enviarJCNombre"></span></div>
+      <div style="display:flex;gap:8px;">
+        <input id="enviarJCAmount" type="number" min="1" placeholder="Cantidad..." style="flex:1;padding:6px;background:#0d0d0d;border:1px solid #444;color:#fff;font-family:'Courier New',monospace;font-size:12px;outline:none;">
+        <button class="btn-sm" style="border-color:#ff88ff;color:#ff88ff;" onclick="confirmarEnvioJC()">Enviar</button>
+        <button class="btn-sm" onclick="document.getElementById('enviarJCPanel').style.display='none'">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PESTAÑA CÓDIGOS -->
+  <div class="menu-panel" id="tab-codigos" style="padding:16px;">
+    <div style="color:#ffcc44;font-size:14px;font-weight:bold;margin-bottom:6px;letter-spacing:2px;">🔑 CÓDIGOS DE TIENDA</div>
+    <div style="color:#666;font-size:11px;margin-bottom:14px;">Introduce un código para desbloquear beneficios</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input id="storeCodeInput" type="text" placeholder="Escribe el código..."
+        style="flex:1;padding:9px;background:#1a1a2e;border:1px solid #444;color:#ffcc44;font-family:'Courier New',monospace;font-size:13px;outline:none;"
+        onkeydown="if(event.key==='Enter') activarCodigoTienda()">
+      <button onclick="activarCodigoTienda()" style="padding:9px 16px;background:#ffcc44;border:none;color:#000;font-family:'Courier New',monospace;font-size:13px;font-weight:bold;cursor:pointer;">ACTIVAR</button>
+    </div>
+    <div style="color:#666;font-size:10px;margin-bottom:8px;letter-spacing:1px;">CÓDIGOS ACTIVOS</div>
+    <div id="activeCodesContainer">
+      <div style="color:#444;font-size:12px;">Ningún código activo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTIFICACIÓN ══ -->
+<div id="notifBadge"></div>
+
+<!-- ══ CHAT EN PARTIDA ══ -->
+<div id="chatBox">
+  <div style="padding:4px 8px;background:#1a1a1a;border-bottom:1px solid #333;font-size:10px;color:#666;display:flex;justify-content:space-between;">
+    <span>💬 CHAT</span>
+    <button onclick="toggleChat()" style="background:none;border:none;color:#666;cursor:pointer;font-size:12px;">✕</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" placeholder="Mensaje..." maxlength="80"
+      onkeydown="if(event.key==='Enter'){enviarChat();event.stopPropagation();}">
+    <button id="chatSendBtn" onclick="enviarChat()">↩</button>
+  </div>
+</div>
+<button id="chatToggleBtn" onclick="toggleChat()" style="
+  position:fixed;bottom:10px;right:10px;z-index:51;
+  background:#1a1a2e;border:1px solid #333;color:#aaa;
+  font-family:'Courier New',monospace;font-size:11px;padding:6px 10px;
+  cursor:pointer;display:none;">💬 CHAT</button>
 
 <!-- DIFICULTAD -->
 <div id="diffScreen">
@@ -612,7 +899,7 @@ body {
   <div id="hud">
     <div class="hud-block">
       <span class="hud-label">Nivel</span>
-      <span class="hud-value" id="levelDisplay">1/25</span>
+      <span class="hud-value" id="levelDisplay">1/20</span>
     </div>
     <div class="hud-block">
       <span class="hud-label">Oleada</span>
@@ -1169,16 +1456,6 @@ const MAPS = [
   ['##################','#D.D.D.D.D.D.D.D.#','#................#','#.######.######..#','#.#D.................#','#.#......D.......#','#.#.......D......#','#.######.######..#','#................#','#.D.D.D.D.D.D.D..#','#................#','##################'],
   // 20 — Abismo
   ['##################','#D.....D.....D...#','#..###.....###...#','#..#.D.....D.#...#','#..#.........#...#','####.........####','#...D.......D....#','#.###.......###..#','#.#D..D...D..D#..#','#.###.......###..#','#D.....D.....D...#','##################'],
-  // 21 — Caos urbano
-  ['##################','##D.##D.##D.##D.##','#................#','#.D..D..D..D..D..#','#................#','###D.........D###','#................#','#.D..D..D..D..D..#','#................#','##D.##D.##D.##D.##','#................#','##################'],
-  // 22 — Dimensión oscura
-  ['##################','#D.D.D.D.D.D.D.D.#','#................#','##D##D##D##D##D##','#................#','#D.D.........D.D.#','#................#','##D##D##D##D##D##','#................#','#.D.D.D.D.D.D.D..#','#................#','##################'],
-  // 23 — Infierno
-  ['##################','#D..D..D..D..D..D#','#..##..##..##..##','#D..............D#','###..###..###..###','#D..............D#','###..###..###..###','#D..............D#','#..##..##..##..##','#D..D..D..D..D..D#','#................#','##################'],
-  // 24 — El fin
-  ['##################','#D.D.D.D.D.D.D.D.#','#.##.##.##.##.##.#','#D..............D#','#.##.##.##.##.##.#','#D.D.........D.D.#','#.##.##.##.##.##.#','#D..............D#','#.##.##.##.##.##.#','#D.D.D.D.D.D.D.D.#','#................#','##################'],
-  // 25 — APOCALIPSIS FINAL
-  ['##################','#DDDDDDDDDDDDDDDD#','#D..............D#','#D.############.D#','#D.#D........D#.D#','#D.#..........#.D#','#D.#D........D#.D#','#D.############.D#','#D..............D#','#DDDDDDDDDDDDDDDD#','#................#','##################'],
 ];
 
 // Paletas de color por nivel (oscuro → día)
@@ -1204,11 +1481,6 @@ const PALETTES = [
   {wall:'#2d0922',wallI:'#1a0514',f1:'#22071a',f2:'#1c0615'},
   {wall:'#050530',wallI:'#030320',f1:'#040428',f2:'#030322'},
   {wall:'#0a0a0a',wallI:'#050505',f1:'#080808',f2:'#060606'},
-  {wall:'#1a001a',wallI:'#100010',f1:'#150015',f2:'#100010'},
-  {wall:'#000a1a',wallI:'#000510',f1:'#000815',f2:'#000610'},
-  {wall:'#1a0000',wallI:'#0f0000',f1:'#150000',f2:'#100000'},
-  {wall:'#0f0f0f',wallI:'#060606',f1:'#0a0a0a',f2:'#080808'},
-  {wall:'#ff2200',wallI:'#cc1500',f1:'#cc1a00',f2:'#aa1400'},
 ];
 
 let solidCells=[], desks=[];
@@ -1692,8 +1964,8 @@ document.getElementById('winRestartBtn').addEventListener('click',()=>{resumeAud
 //  BANNER DE NIVEL
 // ================================================================
 function showLevelBanner(lvl,cb){
-  document.getElementById('levelBannerTitle').textContent = lvl===25?'¡NIVEL FINAL! 👸':`NIVEL ${lvl}`;
-  document.getElementById('levelBannerSub').textContent   = lvl===25?'¡Derrota a Bowser y salva a la Princesa!':'Derrota 3 oleadas · presiona E para la tienda';
+  document.getElementById('levelBannerTitle').textContent = lvl===20?'¡NIVEL FINAL! 👸':`NIVEL ${lvl}`;
+  document.getElementById('levelBannerSub').textContent   = lvl===20?'¡Derrota a Bowser y salva a la Princesa!':'Derrota 3 oleadas · presiona E para la tienda';
   levelBanner.style.display='flex';
   playLevelUp();
   setTimeout(()=>{ levelBanner.style.display='none'; if(cb)cb(); },2200);
@@ -2394,7 +2666,7 @@ function updateWaveSystem(){
 
   } else if(waveState==='levelclear'){
     if(--levelClearTimer<=0){
-      if(currentLevel>=25){ winGame(); return; }
+      if(currentLevel>=20){ winGame(); return; }
       currentLevel++; currentWave=1; zombiesThisWave=0; waveState='spawning';
       bossSpawned=false; zombieSpawnTimer=0;
       zombies.length=cups.length=particles.length=spinCups.length=fireBalls.length=marioGorras.length=0; marioGorraCooldown=0;
@@ -4009,7 +4281,7 @@ function abrirSelectorNivel(){
   `;
 
   let botonesHTML = '';
-  for(let i=1; i<=25; i++){
+  for(let i=1; i<=20; i++){
     const disabled = i === currentLevel ? 'opacity:0.4;cursor:not-allowed;' : 'cursor:pointer;';
     botonesHTML += `<button onclick="irANivel(${i})" style="
       width:52px; height:52px; background:#1a1a2e; border:2px solid #444;
@@ -4809,6 +5081,620 @@ window.shootFacing = function() {
     ws.send(JSON.stringify({ type: 'player_attack', x: player.x, y: player.y, facing: player.facing }));
   }
 };
+
+// ════════════════════════════════════════════════════════
+//  FIREBASE CONFIG — ⚠️ REEMPLAZA CON TUS DATOS
+// ════════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+
+let fbApp, fbAuth, fbDb;
+let currentUser = null;
+let userData = { jcPlus:0, skins:[], equippedSkin:'default', equippedCupSkin:'default', friends:[], activeCodes:[] };
+let invincibleMode = false;
+
+try {
+  fbApp  = firebase.initializeApp(FIREBASE_CONFIG);
+  fbAuth = firebase.auth();
+  fbDb   = firebase.firestore();
+} catch(e) { console.warn('Firebase no configurado:', e.message); }
+
+// ── Login ──
+document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
+  if(!fbAuth){ alert('Firebase no configurado aún'); return; }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    await fbAuth.signInWithPopup(provider);
+  } catch(e) { console.error('Login error:', e); }
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+  if(fbAuth) fbAuth.signOut();
+});
+
+// ── Auth state observer ──
+if(fbAuth) {
+  fbAuth.onAuthStateChanged(async (user) => {
+    if(user) {
+      currentUser = user;
+      document.getElementById('loginScreen').style.display = 'none';
+      await cargarDatosUsuario();
+      mostrarMenuPrincipal();
+    } else {
+      currentUser = null;
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('mainMenu').style.display    = 'none';
+    }
+  });
+}
+
+async function cargarDatosUsuario() {
+  if(!fbDb || !currentUser) return;
+  const ref = fbDb.collection('usuarios').doc(currentUser.uid);
+  const snap = await ref.get();
+  if(snap.exists) {
+    const d = snap.data();
+    userData.jcPlus        = d.jcPlus        || 0;
+    userData.skins         = d.skins         || [];
+    userData.equippedSkin  = d.equippedSkin  || 'default';
+    userData.equippedCupSkin = d.equippedCupSkin || 'default';
+    userData.friends       = d.friends       || [];
+    userData.activeCodes   = d.activeCodes   || [];
+    invincibleMode         = (userData.activeCodes.includes('invencible'));
+  } else {
+    // Primer login → crear documento
+    await ref.set({
+      nombre: currentUser.displayName,
+      email:  currentUser.email,
+      jcPlus: 200, // bono de bienvenida
+      skins: [], equippedSkin:'default', equippedCupSkin:'default',
+      friends:[], activeCodes:[],
+      ultimoLogin: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    userData.jcPlus = 200;
+    mostrarNotif('🎁 ¡Bienvenido! +200 JC+');
+  }
+  // Bono diario
+  await comprobarBonodiario();
+  // Solicitudes de amistad
+  escucharSolicitudes();
+  // Mensajes JC+ recibidos
+  escucharTransferencias();
+}
+
+async function guardarDatosUsuario() {
+  if(!fbDb || !currentUser) return;
+  await fbDb.collection('usuarios').doc(currentUser.uid).update({
+    jcPlus:        userData.jcPlus,
+    skins:         userData.skins,
+    equippedSkin:  userData.equippedSkin,
+    equippedCupSkin: userData.equippedCupSkin,
+    friends:       userData.friends,
+    activeCodes:   userData.activeCodes,
+  });
+}
+
+async function comprobarBonodiario() {
+  if(!fbDb || !currentUser) return;
+  const ref = fbDb.collection('usuarios').doc(currentUser.uid);
+  const snap = await ref.get();
+  const ultimo = snap.data()?.ultimoLogin?.toDate?.() || new Date(0);
+  const hoy = new Date();
+  if(hoy.toDateString() !== ultimo.toDateString()){
+    userData.jcPlus += 200;
+    await ref.update({ jcPlus: userData.jcPlus, ultimoLogin: firebase.firestore.FieldValue.serverTimestamp() });
+    mostrarNotif('🎁 +200 JC+ bono diario');
+  }
+}
+
+function mostrarMenuPrincipal() {
+  const menu = document.getElementById('mainMenu');
+  menu.style.display = 'flex';
+  document.getElementById('userAvatar').src = currentUser?.photoURL || '';
+  document.getElementById('userNameDisplay').textContent = currentUser?.displayName || 'Jugador';
+  actualizarJCDisplay();
+  renderSkins('personaje');
+  renderAmigos();
+  renderCodigosActivos();
+}
+
+function actualizarJCDisplay() {
+  document.getElementById('jcPlusDisplay').textContent = `${userData.jcPlus} JC+`;
+}
+
+function switchMenuTab(tab) {
+  document.querySelectorAll('.menu-tab').forEach((t,i) => t.classList.toggle('active', ['jugar','tienda','amigos','codigos'][i]===tab));
+  document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='tienda') renderSkins(currentSkinTab);
+  if(tab==='amigos') renderAmigos();
+  if(tab==='codigos') renderCodigosActivos();
+}
+
+function irAJugar() {
+  document.getElementById('mainMenu').style.display = 'none';
+  startScreen.style.display = 'flex';
+}
+
+// ════════════════════════════════════════════════════════
+//  SKINS — 30 PERSONAJE + 30 TAZA
+// ════════════════════════════════════════════════════════
+const SKINS_PERSONAJE = [
+  {id:'default',  name:'Oficinista',   price:0,    colors:['#2244bb','#223344','#fff']},
+  {id:'rojo',     name:'Rojo Fuego',   price:200,  colors:['#cc2200','#441100','#ffaa88']},
+  {id:'verde',    name:'Comando',      price:200,  colors:['#226622','#112211','#aaffaa']},
+  {id:'dorado',   name:'Dorado',       price:500,  colors:['#ccaa00','#443300','#ffeeaa']},
+  {id:'negro',    name:'Sombra',       price:300,  colors:['#111111','#000000','#aaaaaa']},
+  {id:'morado',   name:'Púrpura',      price:300,  colors:['#662299','#220044','#ddaaff']},
+  {id:'cyan',     name:'Cian',         price:300,  colors:['#00aacc','#002244','#aaeeff']},
+  {id:'rosa',     name:'Rosa',         price:300,  colors:['#cc4488','#440022','#ffaacc']},
+  {id:'naranja',  name:'Naranja',      price:300,  colors:['#cc6600','#441100','#ffcc88']},
+  {id:'blanco',   name:'Fantasma',     price:400,  colors:['#dddddd','#888888','#ffffff']},
+  {id:'militar',  name:'Militar',      price:400,  colors:['#556633','#334422','#99aa66']},
+  {id:'robot',    name:'Robot',        price:600,  colors:['#667788','#334455','#aabbcc']},
+  {id:'ninja',    name:'Ninja',        price:600,  colors:['#222222','#111111','#555555']},
+  {id:'pirata',   name:'Pirata',       price:500,  colors:['#884422','#441100','#ffcc66']},
+  {id:'zombie',   name:'Zombie',       price:700,  colors:['#556633','#334422','#99cc55']},
+  {id:'fantasma', name:'Espectro',     price:700,  colors:['#8899aa','#445566','#ccdde']},
+  {id:'fuego',    name:'Llamas',       price:800,  colors:['#cc4400','#882200','#ffaa00']},
+  {id:'hielo',    name:'Hielo',        price:800,  colors:['#4488cc','#224466','#aaddff']},
+  {id:'veneno',   name:'Tóxico',       price:800,  colors:['#44cc22','#226611','#aaff66']},
+  {id:'rey',      name:'Rey',          price:1000, colors:['#ccaa00','#885500','#ffdd55']},
+  {id:'invisible',name:'Invisible',    price:1000, colors:['rgba(255,255,255,0.15)','rgba(0,0,0,0.1)','rgba(255,255,255,0.3)']},
+  {id:'demonio',  name:'Demonio',      price:1000, colors:['#880000','#440000','#ff4422']},
+  {id:'angel',    name:'Ángel',        price:1000, colors:['#ffffff','#ddddff','#ffffcc']},
+  {id:'pikachu',  name:'Amarillo ⚡',  price:1200, colors:['#ffcc00','#cc8800','#ffffaa']},
+  {id:'dino',     name:'Dinosaurio',   price:1200, colors:['#33aa44','#116622','#88ffaa']},
+  {id:'astronauta',name:'Astronauta',  price:1500, colors:['#ffffff','#aaaaaa','#dddddd']},
+  {id:'vikingo',  name:'Vikingo',      price:1500, colors:['#cc8844','#664422','#ffddaa']},
+  {id:'samurai',  name:'Samurai',      price:1500, colors:['#cc2222','#441111','#ff8888']},
+  {id:'bruja',    name:'Bruja',        price:1500, colors:['#442266','#221133','#aa44ff']},
+  {id:'leyenda',  name:'Leyenda ✨',   price:3000, colors:['#ffcc44','#ff8800','#ffffff']},
+];
+
+const SKINS_TAZA = [
+  {id:'default',  name:'Taza Normal',  price:0,    color:'#eee',  liquid:'#5c3317'},
+  {id:'dorada',   name:'Taza Dorada',  price:300,  color:'#ffcc44',liquid:'#aa7700'},
+  {id:'roja',     name:'Taza Roja',    price:200,  color:'#cc2200',liquid:'#440000'},
+  {id:'azul',     name:'Taza Azul',    price:200,  color:'#2266cc',liquid:'#112244'},
+  {id:'verde',    name:'Taza Verde',   price:200,  color:'#22aa44',liquid:'#115522'},
+  {id:'negra',    name:'Taza Negra',   price:300,  color:'#222222',liquid:'#000000'},
+  {id:'arcoiris', name:'Arcoíris',     price:500,  color:'#ff44aa',liquid:'#8800cc'},
+  {id:'fuego',    name:'Taza Fuego',   price:600,  color:'#ff6600',liquid:'#cc2200'},
+  {id:'hielo',    name:'Taza Hielo',   price:600,  color:'#aaddff',liquid:'#4488cc'},
+  {id:'veneno',   name:'Taza Tóxica',  price:600,  color:'#44ff22',liquid:'#226611'},
+  {id:'cristal',  name:'Cristal',      price:800,  color:'rgba(200,220,255,0.6)',liquid:'rgba(100,150,255,0.5)'},
+  {id:'lava',     name:'Lava',         price:800,  color:'#ff4400',liquid:'#cc2200'},
+  {id:'sangre',   name:'Sangre',       price:800,  color:'#880000',liquid:'#440000'},
+  {id:'galaxy',   name:'Galaxia',      price:1000, color:'#220044',liquid:'#8800ff'},
+  {id:'oro_solido',name:'Oro Sólido',  price:1000, color:'#ddaa00',liquid:'#886600'},
+  {id:'platino',  name:'Platino',      price:1200, color:'#ccccdd',liquid:'#8888aa'},
+  {id:'diamante', name:'Diamante 💎',  price:1500, color:'#aaddff',liquid:'#66aaff'},
+  {id:'magica',   name:'Mágica ✨',    price:1500, color:'#ff88ff',liquid:'#aa00aa'},
+  {id:'bomba',    name:'Bomba 💣',     price:1200, color:'#333333',liquid:'#ff4400'},
+  {id:'calavera', name:'Calavera 💀',  price:1200, color:'#dddddd',liquid:'#888888'},
+  {id:'pirata',   name:'Pirata',       price:1000, color:'#884422',liquid:'#cc6600'},
+  {id:'ninja',    name:'Ninja',        price:1000, color:'#222222',liquid:'#444444'},
+  {id:'robot',    name:'Robot 🤖',     price:1000, color:'#667788',liquid:'#334455'},
+  {id:'zombie',   name:'Zombie 🧟',    price:1200, color:'#556633',liquid:'#99cc55'},
+  {id:'angel',    name:'Ángel 😇',     price:1500, color:'#ffffee',liquid:'#ffdd88'},
+  {id:'demonio',  name:'Demonio 😈',   price:1500, color:'#660000',liquid:'#ff2200'},
+  {id:'astro',    name:'Astronauta 🚀',price:2000, color:'#dddddd',liquid:'#4488cc'},
+  {id:'dragón',   name:'Dragón 🐉',    price:2000, color:'#cc4400',liquid:'#ff8800'},
+  {id:'unicornio',name:'Unicornio 🦄', price:2000, color:'#ffaaee',liquid:'#cc44ff'},
+  {id:'leyenda',  name:'Taza Leyenda ✨',price:3000,color:'#ffcc44',liquid:'#ff6600'},
+];
+
+let currentSkinTab = 'personaje';
+
+function switchSkinTab(tab) {
+  currentSkinTab = tab;
+  document.getElementById('tbtnPersonaje').style.borderColor = tab==='personaje'?'#ffcc44':'#444';
+  document.getElementById('tbtnPersonaje').style.color       = tab==='personaje'?'#ffcc44':'#aaa';
+  document.getElementById('tbtnTaza').style.borderColor      = tab==='taza'?'#ffcc44':'#444';
+  document.getElementById('tbtnTaza').style.color            = tab==='taza'?'#ffcc44':'#aaa';
+  renderSkins(tab);
+}
+
+function renderSkins(tab) {
+  const list = tab==='personaje' ? SKINS_PERSONAJE : SKINS_TAZA;
+  const equipped = tab==='personaje' ? userData.equippedSkin : userData.equippedCupSkin;
+  const grid = document.getElementById('skinGrid');
+  if(!grid) return;
+  grid.innerHTML = list.map(s => {
+    const owned    = s.price===0 || userData.skins.includes(s.id);
+    const isEquip  = equipped === s.id;
+    const cls      = isEquip ? 'skin-card equipped' : owned ? 'skin-card owned' : 'skin-card';
+    const priceStr = isEquip ? '✓ EQUIPADO' : owned ? '✓ Comprado' : `${s.price} JC+`;
+    const priceCol = isEquip ? '#ff88ff' : owned ? '#44ff88' : '#ff88ff';
+    // Mini preview canvas
+    const preview  = tab==='personaje'
+      ? `<div style="width:60px;height:60px;margin:0 auto 6px;background:${s.colors[0]};border:2px solid ${s.colors[1]};display:flex;align-items:center;justify-content:center;">
+           <div style="width:20px;height:20px;background:${s.colors[2]};"></div>
+         </div>`
+      : `<div style="width:60px;height:40px;margin:0 auto 6px;background:${s.color};border:2px solid #555;position:relative;">
+           <div style="position:absolute;bottom:4px;left:4px;right:4px;height:12px;background:${s.liquid};"></div>
+         </div>`;
+    return `<div class="${cls}" onclick="accionSkin('${s.id}','${tab}',${s.price},${owned})">
+      ${preview}
+      <div class="skin-name">${s.name}</div>
+      <div class="skin-price" style="color:${priceCol}">${priceStr}</div>
+    </div>`;
+  }).join('');
+}
+
+async function accionSkin(id, tipo, precio, owned) {
+  if(owned || precio===0) {
+    // Equipar
+    if(tipo==='personaje') userData.equippedSkin = id;
+    else userData.equippedCupSkin = id;
+    await guardarDatosUsuario();
+    renderSkins(tipo);
+  } else {
+    // Comprar
+    if(userData.jcPlus < precio){ mostrarNotif('❌ JC+ insuficientes'); return; }
+    userData.jcPlus -= precio;
+    userData.skins.push(id);
+    if(tipo==='personaje') userData.equippedSkin = id;
+    else userData.equippedCupSkin = id;
+    await guardarDatosUsuario();
+    actualizarJCDisplay();
+    renderSkins(tipo);
+    mostrarNotif(`✅ ¡${id} comprado y equipado!`);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  AMIGOS
+// ════════════════════════════════════════════════════════
+async function enviarSolicitud() {
+  const email = document.getElementById('addFriendInput').value.trim();
+  if(!email){ mostrarNotif('Escribe el email'); return; }
+  if(!fbDb){ mostrarNotif('Firebase no configurado'); return; }
+  // Buscar usuario por email
+  const snap = await fbDb.collection('usuarios').where('email','==',email).get();
+  if(snap.empty){ mostrarNotif('❌ Usuario no encontrado'); return; }
+  const amigoDoc = snap.docs[0];
+  const amigoId  = amigoDoc.id;
+  if(amigoId === currentUser.uid){ mostrarNotif('❌ No puedes añadirte a ti mismo'); return; }
+  // Enviar solicitud
+  await fbDb.collection('solicitudes').add({
+    de:   currentUser.uid,
+    para: amigoId,
+    nombreDe: currentUser.displayName,
+    emailDe:  currentUser.email,
+    estado:   'pendiente',
+    fecha:    firebase.firestore.FieldValue.serverTimestamp()
+  });
+  document.getElementById('addFriendInput').value = '';
+  mostrarNotif('✅ Solicitud enviada');
+}
+
+function escucharSolicitudes() {
+  if(!fbDb || !currentUser) return;
+  fbDb.collection('solicitudes')
+    .where('para','==',currentUser.uid)
+    .where('estado','==','pendiente')
+    .onSnapshot(snap => {
+      const cont = document.getElementById('solicitudesContainer');
+      if(!cont) return;
+      if(snap.empty){ cont.innerHTML=''; return; }
+      cont.innerHTML = `<div style="color:#ffcc44;font-size:10px;margin-bottom:6px;letter-spacing:1px;">SOLICITUDES</div>` +
+        snap.docs.map(d => {
+          const s = d.data();
+          return `<div class="friend-item">
+            <div class="friend-name">${s.nombreDe}<br><span style="color:#666;font-size:10px;">${s.emailDe}</span></div>
+            <button class="btn-sm green" onclick="aceptarSolicitud('${d.id}','${s.de}','${s.nombreDe}')">✓</button>
+            <button class="btn-sm red"   onclick="rechazarSolicitud('${d.id}')">✕</button>
+          </div>`;
+        }).join('') + `<div style="border-bottom:1px solid #222;margin:10px 0;"></div>`;
+    });
+}
+
+async function aceptarSolicitud(solicitudId, amigoId, nombreAmigo) {
+  await fbDb.collection('solicitudes').doc(solicitudId).update({estado:'aceptada'});
+  // Añadir mutuamente
+  await fbDb.collection('usuarios').doc(currentUser.uid).update({ friends: firebase.firestore.FieldValue.arrayUnion(amigoId) });
+  await fbDb.collection('usuarios').doc(amigoId).update({ friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+  userData.friends.push(amigoId);
+  mostrarNotif(`✅ ¡Ahora eres amigo de ${nombreAmigo}!`);
+  renderAmigos();
+}
+
+async function rechazarSolicitud(solicitudId) {
+  await fbDb.collection('solicitudes').doc(solicitudId).update({estado:'rechazada'});
+}
+
+async function renderAmigos() {
+  const cont = document.getElementById('amigosContainer');
+  if(!cont || !fbDb) return;
+  if(userData.friends.length===0){ cont.innerHTML='<div style="color:#444;font-size:12px;">Sin amigos aún</div>'; return; }
+  cont.innerHTML = '';
+  for(const uid of userData.friends){
+    const snap = await fbDb.collection('usuarios').doc(uid).get();
+    if(!snap.exists) continue;
+    const d = snap.data();
+    cont.innerHTML += `<div class="friend-item">
+      <img class="friend-avatar" src="${d.foto||''}" alt="" onerror="this.style.display='none'">
+      <div>
+        <div class="friend-name">${d.nombre||'Jugador'}</div>
+        <div style="color:#666;font-size:10px;">${d.jcPlus||0} JC+</div>
+      </div>
+      <button class="btn-sm" style="border-color:#ff88ff;color:#ff88ff;" onclick="abrirEnvioJC('${uid}','${d.nombre}')">💸 Enviar JC+</button>
+    </div>`;
+  }
+}
+
+let enviarJCTargetId = '';
+function abrirEnvioJC(uid, nombre) {
+  enviarJCTargetId = uid;
+  document.getElementById('enviarJCNombre').textContent = nombre;
+  document.getElementById('enviarJCPanel').style.display = 'block';
+}
+
+async function confirmarEnvioJC() {
+  const amt = parseInt(document.getElementById('enviarJCAmount').value);
+  if(isNaN(amt)||amt<=0){ mostrarNotif('Cantidad inválida'); return; }
+  if(userData.jcPlus < amt){ mostrarNotif('❌ JC+ insuficientes'); return; }
+  // Descontar de mi cuenta
+  userData.jcPlus -= amt;
+  await guardarDatosUsuario();
+  // Crear transferencia para el destinatario
+  await fbDb.collection('transferencias').add({
+    de:      currentUser.uid,
+    para:    enviarJCTargetId,
+    cantidad: amt,
+    nombreDe: currentUser.displayName,
+    leido:   false,
+    fecha:   firebase.firestore.FieldValue.serverTimestamp()
+  });
+  actualizarJCDisplay();
+  document.getElementById('enviarJCPanel').style.display = 'none';
+  mostrarNotif(`✅ Enviados ${amt} JC+`);
+}
+
+function escucharTransferencias() {
+  if(!fbDb || !currentUser) return;
+  fbDb.collection('transferencias')
+    .where('para','==',currentUser.uid)
+    .where('leido','==',false)
+    .onSnapshot(async snap => {
+      for(const d of snap.docs){
+        const t = d.data();
+        userData.jcPlus += t.cantidad;
+        await guardarDatosUsuario();
+        actualizarJCDisplay();
+        mostrarNotif(`💸 Recibiste ${t.cantidad} JC+ de ${t.nombreDe}`);
+        await d.ref.update({leido:true});
+      }
+    });
+}
+
+// ════════════════════════════════════════════════════════
+//  CÓDIGOS DE TIENDA
+// ════════════════════════════════════════════════════════
+const CODIGOS_TIENDA = {
+  'jerocoins+': async () => {
+    const opcion = await mostrarDialogoJCPlus();
+    return opcion;
+  },
+  'invencible': () => {
+    invincibleMode = !invincibleMode;
+    if(invincibleMode){
+      if(!userData.activeCodes.includes('invencible')) userData.activeCodes.push('invencible');
+    } else {
+      userData.activeCodes = userData.activeCodes.filter(c=>c!=='invencible');
+    }
+    guardarDatosUsuario();
+    renderCodigosActivos();
+    return invincibleMode ? '🛡️ Invencible ACTIVADO' : '🛡️ Invencible DESACTIVADO';
+  }
+};
+
+async function activarCodigoTienda() {
+  const input = document.getElementById('storeCodeInput');
+  const codigo = input.value.trim().toLowerCase();
+  input.value = '';
+  if(!codigo) return;
+  if(CODIGOS_TIENDA[codigo]) {
+    const msg = await CODIGOS_TIENDA[codigo]();
+    if(msg) mostrarNotif(msg);
+  } else {
+    mostrarNotif('❌ Código no válido');
+  }
+}
+
+function mostrarDialogoJCPlus() {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    ov.innerHTML = `
+      <div style="background:#12121f;border:2px solid #ff88ff;padding:28px 32px;font-family:'Courier New',monospace;color:#fff;min-width:300px;">
+        <div style="color:#ff88ff;font-size:17px;font-weight:bold;letter-spacing:2px;margin-bottom:16px;">💎 JEROCOINS+</div>
+        <button onclick="this.closest('div').parentNode._resolve('infinito')" style="width:100%;padding:10px;background:#ff88ff;border:none;color:#000;font-family:'Courier New',monospace;font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:8px;">♾️ JC+ INFINITOS</button>
+        <div style="color:#aaa;font-size:11px;margin:8px 0;">O elige cantidad:</div>
+        <div style="display:flex;gap:8px;">
+          <input id="jcPlusInput" type="number" min="1" placeholder="Cantidad..."
+            style="flex:1;padding:8px;background:#1a1a2e;border:1px solid #444;color:#ffcc44;font-family:'Courier New',monospace;font-size:14px;outline:none;">
+          <button onclick="this.closest('div').parentNode._resolve(document.getElementById('jcPlusInput').value)" style="padding:8px 14px;background:#ffcc44;border:none;color:#000;font-family:'Courier New',monospace;font-size:13px;font-weight:bold;cursor:pointer;">DAR</button>
+        </div>
+        <button onclick="this.closest('div').parentNode._resolve(null)" style="width:100%;padding:8px;background:#333;border:1px solid #555;color:#aaa;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;margin-top:10px;">CANCELAR</button>
+      </div>`;
+    ov._resolve = async (val) => {
+      ov.remove();
+      if(!val) { resolve(null); return; }
+      if(val === 'infinito'){
+        userData.jcPlus = 999999999;
+        if(!userData.activeCodes.includes('jerocoins+')) userData.activeCodes.push('jerocoins+');
+      } else {
+        const n = parseInt(val);
+        if(!isNaN(n) && n>0) userData.jcPlus += n;
+      }
+      await guardarDatosUsuario();
+      actualizarJCDisplay();
+      renderCodigosActivos();
+      resolve(`✅ JC+ actualizados`);
+    };
+    document.body.appendChild(ov);
+  });
+}
+
+function renderCodigosActivos() {
+  const cont = document.getElementById('activeCodesContainer');
+  if(!cont) return;
+  if(userData.activeCodes.length===0){
+    cont.innerHTML = '<div style="color:#444;font-size:12px;">Ningún código activo</div>';
+    return;
+  }
+  cont.innerHTML = userData.activeCodes.map(c => `
+    <div class="code-active-item">
+      <span style="color:#ffcc44;font-weight:bold;letter-spacing:1px;">${c}</span>
+      <button class="btn-sm red" onclick="desactivarCodigo('${c}')">Desactivar</button>
+    </div>`).join('');
+}
+
+async function desactivarCodigo(codigo) {
+  userData.activeCodes = userData.activeCodes.filter(c=>c!==codigo);
+  if(codigo==='invencible') invincibleMode = false;
+  if(codigo==='jerocoins+') userData.jcPlus = Math.min(userData.jcPlus, 999999);
+  await guardarDatosUsuario();
+  actualizarJCDisplay();
+  renderCodigosActivos();
+  mostrarNotif(`Código "${codigo}" desactivado`);
+}
+
+// ════════════════════════════════════════════════════════
+//  CHAT EN PARTIDA
+// ════════════════════════════════════════════════════════
+let chatVisible = false;
+
+function toggleChat() {
+  chatVisible = !chatVisible;
+  document.getElementById('chatBox').style.display = chatVisible ? 'flex' : 'none';
+}
+
+function mostrarChatBoton(mostrar) {
+  document.getElementById('chatToggleBtn').style.display = mostrar ? 'block' : 'none';
+  if(!mostrar){ document.getElementById('chatBox').style.display = 'none'; chatVisible=false; }
+}
+
+function enviarChat() {
+  const input = document.getElementById('chatInput');
+  const txt   = input.value.trim();
+  if(!txt) return;
+  input.value = '';
+  const nombre = currentUser?.displayName || miNombre || 'Yo';
+  // Mostrar localmente
+  agregarMensajeChat(nombre, txt, true);
+  // Enviar por WebSocket a los demás
+  if(ws && ws.readyState === WebSocket.OPEN)
+    ws.send(JSON.stringify({ type:'chat', text: txt, name: nombre }));
+}
+
+function agregarMensajeChat(nombre, texto, esPropio) {
+  const cont = document.getElementById('chatMessages');
+  if(!cont) return;
+  const div = document.createElement('div');
+  div.className = 'chat-msg';
+  const color = esPropio ? '#ffcc44' : '#1a9de0';
+  div.innerHTML = `<span style="color:${color}">${nombre}:</span> ${texto}`;
+  cont.appendChild(div);
+  cont.scrollTop = cont.scrollHeight;
+  // Máx 50 mensajes
+  while(cont.children.length > 50) cont.removeChild(cont.firstChild);
+}
+
+// Interceptar mensajes de chat del WS
+const _origManejarMensaje = manejarMensaje;
+window.manejarMensaje = function(msg) {
+  if(msg.type === 'chat'){
+    agregarMensajeChat(msg.name || '?', msg.text, false);
+    return;
+  }
+  _origManejarMensaje(msg);
+};
+
+// ════════════════════════════════════════════════════════
+//  INVENCIBLE — aplicar en juego
+// ════════════════════════════════════════════════════════
+// Parchar las líneas que restan vidas para respetar invencibleMode
+const _origUpdateZombies = updateZombies;
+window.updateZombies = function() {
+  _origUpdateZombies();
+  // Si invencible: restaurar vidas si bajan
+  if(invincibleMode && gameRunning && lives < maxLives){
+    lives = maxLives; updateHearts();
+  }
+};
+
+// ════════════════════════════════════════════════════════
+//  MOSTRAR CHAT AL INICIAR PARTIDA MP
+// ════════════════════════════════════════════════════════
+const _origStartGame = startGame;
+window.startGame = function(fromLevel) {
+  _origStartGame(fromLevel);
+  mostrarChatBoton(mpActivo);
+};
+
+// ════════════════════════════════════════════════════════
+//  NOTIFICACIONES
+// ════════════════════════════════════════════════════════
+function mostrarNotif(msg, dur=3000) {
+  const el = document.getElementById('notifBadge');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(()=>el.style.display='none', dur);
+}
+
+// ════════════════════════════════════════════════════════
+//  VOLVER AL MENÚ AL TERMINAR PARTIDA
+// ════════════════════════════════════════════════════════
+const _origEndGame = endGame;
+window.endGame = function() {
+  _origEndGame();
+  mostrarChatBoton(false);
+  setTimeout(()=>{
+    if(currentUser && document.getElementById('gameOverScreen').style.display!=='none'){
+      // Botón extra para volver al menú
+      const btn = document.getElementById('gameOverScreen').querySelector('.btn');
+      if(btn && !document.getElementById('btnVolverMenu')){
+        const b2 = document.createElement('button');
+        b2.id='btnVolverMenu'; b2.className='btn'; b2.textContent='🏠 MENÚ';
+        b2.style.marginTop='8px'; b2.style.background='#1a1a2e';
+        b2.addEventListener('click',()=>{ document.getElementById('gameOverScreen').style.display='none'; mostrarMenuPrincipal(); });
+        btn.parentNode.appendChild(b2);
+      }
+    }
+  }, 100);
+};
+
+
+// --- CONFIGURACIÓN DE FIREBASE ---
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-Uos_u6FD2dw4Kf_qlgJSOm8pliL0Tg",
+  authDomain: "oficina-del-apocalipsis.firebaseapp.com",
+  projectId: "oficina-del-apocalipsis",
+  storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
+  messagingSenderId: "211439249979",
+  appId: "1:211439249979:web:3b0fbcdcdcfc3e8b028a1e",
+  measurementId: "G-HM0NSL16S5"
+};
+
+
+// INICIALIZACIÓN DE SERVICIOS
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+console.log("Firebase inicializado con éxito.");
 
 </script>
 </body>
