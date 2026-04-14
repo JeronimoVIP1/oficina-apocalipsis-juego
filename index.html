@@ -5612,3 +5612,87 @@ window.endGame = function() {
 </script>
 </body>
 </html>
+<script>
+// ════════════════════════════════════════════════════════
+//  INYECCIÓN DE LÓGICA MULTIJUGADOR Y GUARDADO (FIREBASE)
+// ════════════════════════════════════════════════════════
+
+// 1. SINCRONIZACIÓN DE MONEDAS (JC+)
+// Esta función se activa automáticamente cuando ganas o compras algo
+async function sincronizarJCPlus(cantidad) {
+    if (!currentUser) return;
+    try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        await userRef.update({
+            jcPlus: firebase.firestore.FieldValue.increment(cantidad)
+        });
+        // Actualizar visualmente
+        userData.jcPlus += cantidad;
+        if(document.getElementById('jcPlusDisplay')) {
+            document.getElementById('jcPlusDisplay').textContent = userData.jcPlus + " JC+";
+        }
+    } catch (e) {
+        console.error("Error al guardar monedas:", e);
+    }
+}
+
+// 2. MOTOR DE MOVIMIENTO MULTIJUGADOR
+// Envía tu posición a la sala cada vez que te mueves
+function transmitirMiPosicion() {
+    if (window.mpActivo && window.salaId && window.currentUser) {
+        db.collection('salas').doc(window.salaId)
+          .collection('jugadores').doc(currentUser.uid).set({
+            x: player.x,
+            y: player.y,
+            nombre: currentUser.displayName,
+            foto: currentUser.photoURL,
+            skin: userData.equippedSkin || 'default',
+            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+    }
+}
+
+// 3. ACTUALIZAR EL JUEGO (HOOK)
+// Forzamos al juego a que use la transmisión de datos
+const originalUpdate = window.update;
+window.update = function() {
+    if (typeof originalUpdate === 'function') originalUpdate();
+    
+    // Si la partida está activa, mandamos nuestra posición a la nube
+    if (window.gameRunning && window.mpActivo) {
+        transmitirMiPosicion();
+    }
+};
+
+// 4. LÓGICA DE LA TIENDA (ARREGLO)
+// Asegura que las compras se guarden para siempre
+window.comprarSkinReal = async function(skinId, precio) {
+    if (userData.jcPlus >= precio) {
+        await sincronizarJCPlus(-precio); // Restar monedas en la nube
+        userData.ownedSkins.push(skinId);
+        await db.collection('users').doc(currentUser.uid).update({
+            ownedSkins: userData.ownedSkins
+        });
+        alert("¡Skin comprada y guardada!");
+    } else {
+        alert("No tienes suficientes JC+");
+    }
+};
+
+// 5. ESCUCHA DE OTROS JUGADORES
+// Hace que los demás jugadores aparezcan en tu pantalla
+function conectarNubeMultijugador(idSala) {
+    db.collection('salas').doc(idSala).collection('jugadores')
+    .onSnapshot((snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            const data = change.doc.data();
+            if (change.doc.id !== currentUser.uid) {
+                // Los guardamos en el array global para que el juego los dibuje
+                otrosJugadores[change.doc.id] = data;
+            }
+        });
+    });
+}
+
+console.log("🚀 Sistema de Inyección ODA activado correctamente.");
+</script>
