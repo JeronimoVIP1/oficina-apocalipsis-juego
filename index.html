@@ -1169,7 +1169,8 @@ function reapplyUpgrades(){
 
 function renderShop(){
   shopGrid.innerHTML='';
-  shopPointsEl.textContent = `🪙 ${score} JeroCoins`;
+  const currentPoints = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : userData.jcPlus;
+  shopPointsEl.textContent = `🪙 ${currentPoints} JC+`;
 
   UPGRADE_DEFS.forEach(u=>{
     const curLvl  = upgrades[u.id];
@@ -5040,6 +5041,18 @@ try {
   fbDb   = firebase.firestore();
 } catch(e) { console.warn('Firebase error:', e.message); }
 
+window.userData = window.userData || userData;
+window.userData.jcPlus = window.userData.jcPlus || 0;
+window.userData.skins = Array.isArray(window.userData.skins) ? window.userData.skins : [];
+window.userData.ownedSkins = Array.isArray(window.userData.ownedSkins) ? window.userData.ownedSkins : (window.userData.skins.length ? [...window.userData.skins] : ['default']);
+window.userData.equippedSkin = window.userData.equippedSkin || 'default';
+window.userData.equippedCupSkin = window.userData.equippedCupSkin || 'default';
+window.userData.friends = Array.isArray(window.userData.friends) ? window.userData.friends : [];
+window.userData.activeCodes = Array.isArray(window.userData.activeCodes) ? window.userData.activeCodes : [];
+window.currentUser = currentUser;
+window.fbAuth = fbAuth;
+window.fbDb = fbDb;
+
 // ── Login ──
 document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
   if(!fbAuth){ alert('Firebase no configurado aún'); return; }
@@ -5055,14 +5068,52 @@ document.getElementById('btnLogout').addEventListener('click', () => {
 
 // ── Auth state observer ──
 if(fbAuth) {
-  fbAuth.onAuthStateChanged(async (user) => {
+  fbAuth.onAuthStateChanged((user) => {
     if(user) {
       currentUser = user;
+      window.currentUser = currentUser;
+      window.fbDb = fbDb;
       document.getElementById('loginScreen').style.display = 'none';
-      await cargarDatosUsuario();
-      mostrarMenuPrincipal();
+
+      fbDb.collection('usuarios').doc(user.uid).get().then((doc) => {
+          if (doc.exists) {
+              // CARGA REAL DE DATOS
+              const data = doc.data();
+              window.userData.jcPlus = data.jcPlus || 0;
+              window.userData.ownedSkins = data.ownedSkins || ['default'];
+              console.log("¡Datos cargados! Saldo:", window.userData.jcPlus);
+          } else {
+              // Usuario nuevo: registrar en la nube
+              fbDb.collection('usuarios').doc(user.uid).set(window.userData);
+          }
+          // Actualizar el marcador visual del menú
+          if(typeof actualizarUIPuntos === 'function') actualizarUIPuntos();
+
+          // Sincronización interna
+          window.userData.skins = [...window.userData.ownedSkins];
+          userData.jcPlus = window.userData.jcPlus;
+          userData.skins = [...window.userData.ownedSkins];
+          userData.equippedSkin = doc.exists ? (doc.data().equippedSkin || 'default') : (window.userData.equippedSkin || 'default');
+          userData.equippedCupSkin = doc.exists ? (doc.data().equippedCupSkin || 'default') : (window.userData.equippedCupSkin || 'default');
+          userData.friends = doc.exists ? (doc.data().friends || []) : (window.userData.friends || []);
+          userData.activeCodes = doc.exists ? (doc.data().activeCodes || []) : (window.userData.activeCodes || []);
+          window.userData.equippedSkin = userData.equippedSkin;
+          window.userData.equippedCupSkin = userData.equippedCupSkin;
+          window.userData.friends = [...userData.friends];
+          window.userData.activeCodes = [...userData.activeCodes];
+          invincibleMode = userData.activeCodes.includes('invencible');
+      }).then(async () => {
+        await comprobarBonodiario();
+        escucharSolicitudes();
+        escucharTransferencias();
+        mostrarMenuPrincipal();
+      }).catch((e) => {
+        console.error('Error cargando datos de Firebase:', e);
+        mostrarMenuPrincipal();
+      });
     } else {
       currentUser = null;
+      window.currentUser = null;
       document.getElementById('loginScreen').style.display = 'flex';
       document.getElementById('mainMenu').style.display    = 'none';
     }
@@ -5072,17 +5123,26 @@ if(fbAuth) {
 async function cargarDatosUsuario() {
   if(!fbDb || !currentUser) return;
   const ref = fbDb.collection('usuarios').doc(currentUser.uid);
-  const snap = await ref.get();
-  if(snap.exists) {
+  const snap = await ref.get();    if(snap.exists) {
     const d = snap.data();
-    userData.jcPlus        = d.jcPlus        || 0;
-    userData.skins         = d.skins         || [];
+    // Carga Inicial: Leer de Firebase y asignar a variables globales
+    window.userData.jcPlus = d.jcPlus || 0;
+    window.userData.ownedSkins = d.ownedSkins || d.skins || ['default'];
+    
+    // Sincronizar con el objeto local del juego
+    userData.jcPlus = window.userData.jcPlus;
+    userData.skins = window.userData.ownedSkins;
+    
     userData.equippedSkin  = d.equippedSkin  || 'default';
     userData.equippedCupSkin = d.equippedCupSkin || 'default';
     userData.friends       = d.friends       || [];
     userData.activeCodes   = d.activeCodes   || [];
     invincibleMode         = (userData.activeCodes.includes('invencible'));
-  } else {
+    
+    // Forzar actualización visual
+    if(typeof actualizarUIPuntos === 'function') actualizarUIPuntos();
+    actualizarJCDisplay();
+  }else {
     // Primer login → crear documento
     await ref.set({
       nombre: currentUser.displayName,
@@ -5105,8 +5165,17 @@ async function cargarDatosUsuario() {
 
 async function guardarDatosUsuario() {
   if(!fbDb || !currentUser) return;
+  window.userData.jcPlus = userData.jcPlus;
+  window.userData.skins = Array.isArray(userData.skins) ? [...userData.skins] : [];
+  window.userData.ownedSkins = [...window.userData.skins];
+  window.userData.equippedSkin = userData.equippedSkin;
+  window.userData.equippedCupSkin = userData.equippedCupSkin;
+  window.userData.friends = Array.isArray(userData.friends) ? [...userData.friends] : [];
+  window.userData.activeCodes = Array.isArray(userData.activeCodes) ? [...userData.activeCodes] : [];
+
   await fbDb.collection('usuarios').doc(currentUser.uid).update({
     jcPlus:        userData.jcPlus,
+    ownedSkins:    window.userData.ownedSkins,
     skins:         userData.skins,
     equippedSkin:  userData.equippedSkin,
     equippedCupSkin: userData.equippedCupSkin,
@@ -5140,7 +5209,10 @@ function mostrarMenuPrincipal() {
 }
 
 function actualizarJCDisplay() {
-  document.getElementById('jcPlusDisplay').textContent = `${userData.jcPlus} JC+`;
+  // Sincronización del HUD: Siempre usa window.userData.jcPlus para mostrar las monedas
+  const currentPoints = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : userData.jcPlus;
+  document.getElementById('jcPlusDisplay').textContent = `${currentPoints} JC+`;
+  if(typeof window.actualizarUIPuntos === 'function') window.actualizarUIPuntos();
 }
 
 function switchMenuTab(tab) {
@@ -5256,7 +5328,7 @@ function renderSkins(tab) {
       : `<div style="width:60px;height:40px;margin:0 auto 6px;background:${s.color};border:2px solid #555;position:relative;">
            <div style="position:absolute;bottom:4px;left:4px;right:4px;height:12px;background:${s.liquid};"></div>
          </div>`;
-    return `<div class="${cls}" onclick="accionSkin('${s.id}','${tab}',${s.price},${owned})">
+    return `<div class="${cls}" onclick="window.comprarSkinSeguro('${s.id}',${s.price})">
       ${preview}
       <div class="skin-name">${s.name}</div>
       <div class="skin-price" style="color:${priceCol}">${priceStr}</div>
@@ -5284,6 +5356,63 @@ async function accionSkin(id, tipo, precio, owned) {
     mostrarNotif(`✅ ¡${id} comprado y equipado!`);
   }
 }
+
+window.actualizarUIPuntos = function actualizarUIPuntos() {
+  // HUD: Asegúrate de que la línea que cambia el texto del contador de monedas use window.userData.jcPlus
+  const puntosActuales = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : 0;
+  
+  const menuPointsEl = document.getElementById('jcPlusDisplay');
+  if(menuPointsEl) menuPointsEl.textContent = `${puntosActuales} JC+`;
+  
+  if(shopPointsEl) shopPointsEl.textContent = `🪙 ${puntosActuales} JC+`;
+};
+
+// Sobrescribir comprarSkinSeguro para manejar equipamiento y UI
+(function() {
+    const originalComprarSkinSeguro = window.comprarSkinSeguro;
+    window.comprarSkinSeguro = async function(skinId, precio, tipo, owned) {
+        const tipoReal = tipo || currentSkinTab;
+        const ownedReal = typeof owned === 'boolean'
+          ? owned
+          : (precio === 0 || userData.skins.includes(skinId));
+
+        if (ownedReal || precio === 0) {
+            // Ya es dueña, solo equipar
+            if (tipoReal === 'personaje') userData.equippedSkin = skinId;
+            else userData.equippedCupSkin = skinId;
+            window.userData.equippedSkin = userData.equippedSkin;
+            window.userData.equippedCupSkin = userData.equippedCupSkin;
+            await guardarDatosUsuario();
+            renderSkins(tipoReal);
+            return;
+        }
+
+        if (window.userData.jcPlus >= precio) {
+            window.userData.jcPlus -= precio;
+            if(!window.userData.skins.includes(skinId)) {
+                window.userData.skins.push(skinId);
+            }
+            if(!window.userData.ownedSkins.includes(skinId)) {
+                window.userData.ownedSkins.push(skinId);
+            }
+            userData.jcPlus = window.userData.jcPlus;
+            userData.skins = [...window.userData.ownedSkins];
+            // Equipar automáticamente al comprar
+            if (tipoReal === 'personaje') userData.equippedSkin = skinId;
+            else userData.equippedCupSkin = skinId;
+            window.userData.equippedSkin = userData.equippedSkin;
+            window.userData.equippedCupSkin = userData.equippedCupSkin;
+            
+            await guardarDatosUsuario();
+            actualizarJCDisplay();
+            renderSkins(tipoReal);
+            
+            if(typeof window.mostrarNotif === 'function') window.mostrarNotif("👕 Skin guardada para siempre");
+        } else {
+            if(typeof window.mostrarNotif === 'function') window.mostrarNotif("❌ JC+ insuficientes");
+        }
+    };
+})();
 
 // ════════════════════════════════════════════════════════
 //  AMIGOS
@@ -5609,90 +5738,52 @@ window.endGame = function() {
   }, 100);
 };
 
+    // === FIREBASE + WEBSOCKETS ===
+    (function() {
+        console.log("🛡️ Sincronizador Firebase cargado.");
+        // 1. Guardar JC+ al finalizar partida
+        async function sincronizarPuntosConNube() {
+            if (window.currentUser && window.score > 0 && window.fbDb) {
+                try {
+                    // Actualizar objeto local de usuario
+                    window.userData.jcPlus += window.score;
+                    
+                    // Actualizar en Firestore (usando la colección 'usuarios' de tu config)
+                    await window.fbDb.collection('usuarios').doc(window.currentUser.uid).update({
+                        jcPlus: window.userData.jcPlus,
+                        lastSync: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    if(typeof window.mostrarNotif === 'function') {
+                        window.mostrarNotif("☁️ Progreso guardado en Google");
+                    }
+                    
+                    console.log("Puntos sincronizados: " + window.score);
+                    window.score = 0; // Reset para evitar bucles
+                    
+                    if(typeof window.actualizarUIPuntos === 'function') window.actualizarUIPuntos();
+                    if(typeof window.actualizarJCDisplay === 'function') window.actualizarJCDisplay();
+                } catch (e) {
+                    console.error("Error de sincronización Firebase:", e);
+                }
+            }
+        }
+        // 2. Hook en endGame (Muerte)
+        if (typeof window.endGame === 'function') {
+            const originalEndGame = window.endGame;
+            window.endGame = function() {
+                originalEndGame(); 
+                sincronizarPuntosConNube();
+            };
+        }
+        // 3. Hook en winGame (Victoria)
+        if (typeof window.winGame === 'function') {
+            const originalWinGame = window.winGame;
+            window.winGame = function() {
+                originalWinGame();
+                sincronizarPuntosConNube();
+            };
+        }
+    })();
 </script>
 </body>
 </html>
-<script>
-// ════════════════════════════════════════════════════════
-//  INYECCIÓN DE LÓGICA MULTIJUGADOR Y GUARDADO (FIREBASE)
-// ════════════════════════════════════════════════════════
-
-// 1. SINCRONIZACIÓN DE MONEDAS (JC+)
-// Esta función se activa automáticamente cuando ganas o compras algo
-async function sincronizarJCPlus(cantidad) {
-    if (!currentUser) return;
-    try {
-        const userRef = db.collection('users').doc(currentUser.uid);
-        await userRef.update({
-            jcPlus: firebase.firestore.FieldValue.increment(cantidad)
-        });
-        // Actualizar visualmente
-        userData.jcPlus += cantidad;
-        if(document.getElementById('jcPlusDisplay')) {
-            document.getElementById('jcPlusDisplay').textContent = userData.jcPlus + " JC+";
-        }
-    } catch (e) {
-        console.error("Error al guardar monedas:", e);
-    }
-}
-
-// 2. MOTOR DE MOVIMIENTO MULTIJUGADOR
-// Envía tu posición a la sala cada vez que te mueves
-function transmitirMiPosicion() {
-    if (window.mpActivo && window.salaId && window.currentUser) {
-        db.collection('salas').doc(window.salaId)
-          .collection('jugadores').doc(currentUser.uid).set({
-            x: player.x,
-            y: player.y,
-            nombre: currentUser.displayName,
-            foto: currentUser.photoURL,
-            skin: userData.equippedSkin || 'default',
-            lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-    }
-}
-
-// 3. ACTUALIZAR EL JUEGO (HOOK)
-// Forzamos al juego a que use la transmisión de datos
-const originalUpdate = window.update;
-window.update = function() {
-    if (typeof originalUpdate === 'function') originalUpdate();
-    
-    // Si la partida está activa, mandamos nuestra posición a la nube
-    if (window.gameRunning && window.mpActivo) {
-        transmitirMiPosicion();
-    }
-};
-
-// 4. LÓGICA DE LA TIENDA (ARREGLO)
-// Asegura que las compras se guarden para siempre
-window.comprarSkinReal = async function(skinId, precio) {
-    if (userData.jcPlus >= precio) {
-        await sincronizarJCPlus(-precio); // Restar monedas en la nube
-        userData.ownedSkins.push(skinId);
-        await db.collection('users').doc(currentUser.uid).update({
-            ownedSkins: userData.ownedSkins
-        });
-        alert("¡Skin comprada y guardada!");
-    } else {
-        alert("No tienes suficientes JC+");
-    }
-};
-
-// 5. ESCUCHA DE OTROS JUGADORES
-// Hace que los demás jugadores aparezcan en tu pantalla
-function conectarNubeMultijugador(idSala) {
-    db.collection('salas').doc(idSala).collection('jugadores')
-    .onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            const data = change.doc.data();
-            if (change.doc.id !== currentUser.uid) {
-                // Los guardamos en el array global para que el juego los dibuje
-                otrosJugadores[change.doc.id] = data;
-            }
-        });
-    });
-}
-
-console.log("🚀 Sistema de Inyección ODA activado correctamente.");
-</script>
