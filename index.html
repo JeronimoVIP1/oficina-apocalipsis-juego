@@ -563,7 +563,7 @@ body {
     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
     Entrar con Google
   </button>
-  <button id="btnGuestLogin" style="margin-top:12px;background:transparent;border:1px solid #444;color:#888;padding:10px 24px;font-family:'Courier New',monospace;font-size:13px;cursor:pointer;border-radius:4px;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.borderColor='#666';this.style.color='#aaa';" onmouseout="this.style.borderColor='#444';this.style.color='#888';">
+  <button id="btnGuestLogin" style="margin-top:12px;background:transparent;border:1px solid #444;color:#888;padding:10px 24px;font-family:'Courier New',monospace;font-size:13px;cursor:pointer;border-radius:4px;letter-spacing:1px;">
     👤 Jugar sin iniciar sesión
   </button>
   <p style="color:#444;font-size:10px;margin-top:8px;">El progreso no se guardará en modo invitado</p>
@@ -573,7 +573,7 @@ body {
 <div id="mainMenu">
   <div id="mainMenuTop">
     <div style="display:flex;align-items:center;gap:10px;">
-      <img id="userAvatar" src="" alt="" style="width:36px;height:36px;border-radius:50%;display:none;" id="userAvatarImg">
+      <img id="userAvatar" src="" alt="" style="width:36px;height:36px;border-radius:50%;display:none;">
       <div>
         <div id="userNameDisplay">—</div>
         <div id="jcPlusDisplay" style="display:none;">0 JC+</div>
@@ -3098,7 +3098,7 @@ function drawPrincessSprite(cx,cy,sc){
 // ================================================================
 function endGame(){
   gameRunning=false; playGameOver();
-  // GUARDAR EN FIREBASE antes de mostrar pantalla
+  // Guardar puntos en Firebase antes de mostrar pantalla
   if(typeof window.sincronizarPuntosConNube === 'function') window.sincronizarPuntosConNube(score);
   finalScoreEl.textContent=score;
   goLevelTxt.textContent  =`Llegaste al nivel ${currentLevel}`;
@@ -3107,7 +3107,7 @@ function endGame(){
 }
 function winGame(){
   gameRunning=false; playWin();
-  // GUARDAR EN FIREBASE antes de mostrar pantalla
+  // Guardar puntos en Firebase antes de mostrar pantalla
   if(typeof window.sincronizarPuntosConNube === 'function') window.sincronizarPuntosConNube(score);
   winScoreEl.textContent=score;
   hudEl.style.display='none'; taskBanner.style.display='none'; floatMsg.style.display='none';
@@ -5029,53 +5029,49 @@ window.shootFacing = function() {
 };
 
 // ════════════════════════════════════════════════════════
-//  FIREBASE CONFIG — ⚠️ REEMPLAZA CON TUS DATOS
+//  FIREBASE — configuración y lógica completa
 // ════════════════════════════════════════════════════════
+
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyC-Uos_u6FD2dw4Kf_qlgJSOm8pliL0Tg",
+  apiKey: "AIzaSyDt-3o6_UtR6f2oWdT_4jgF50Hp1Ii1otg",
   authDomain: "oficina-del-apocalipsis.firebaseapp.com",
   projectId: "oficina-del-apocalipsis",
   storageBucket: "oficina-del-apocalipsis.firebasestorage.app",
   messagingSenderId: "211439249979",
-  appId: "1:211439249979:web:3b0fbcdcdcfc3e8b028a1e",
-  measurementId: "G-HM0NSL16S5"
+  appId: "1:211439249979:web:3b0bfbcdcd9c3e86b28a1e",
+  measurementId: "G-MBN95L1606"
 };
 
 let fbApp, fbAuth, fbDb;
 let currentUser = null;
-let userData = { jcPlus:0, skins:[], equippedSkin:'default', equippedCupSkin:'default', friends:[], activeCodes:[] };
-let invincibleMode = false;
+window._guestMode = false;
 
 try {
   fbApp  = firebase.apps.length ? firebase.app() : firebase.initializeApp(FIREBASE_CONFIG);
   fbAuth = firebase.auth();
   fbDb   = firebase.firestore();
-} catch(e) { console.warn('Firebase error:', e.message); }
+} catch(e) { console.warn('Firebase init error:', e.message); }
 
-window.userData = window.userData || userData;
-window.userData.jcPlus = window.userData.jcPlus || 0;
-window.userData.skins = Array.isArray(window.userData.skins) ? window.userData.skins : [];
-window.userData.ownedSkins = Array.isArray(window.userData.ownedSkins) ? window.userData.ownedSkins : (window.userData.skins.length ? [...window.userData.skins] : ['default']);
+window.userData = window.userData || { jcPlus:0, skins:[], ownedSkins:['default'], equippedSkin:'default', equippedCupSkin:'default', friends:[], activeCodes:[] };
+window.userData.jcPlus       = window.userData.jcPlus       || 0;
+window.userData.ownedSkins   = Array.isArray(window.userData.ownedSkins)   ? window.userData.ownedSkins   : ['default'];
 window.userData.equippedSkin = window.userData.equippedSkin || 'default';
 window.userData.equippedCupSkin = window.userData.equippedCupSkin || 'default';
-window.userData.friends = Array.isArray(window.userData.friends) ? window.userData.friends : [];
-window.userData.activeCodes = Array.isArray(window.userData.activeCodes) ? window.userData.activeCodes : [];
+window.userData.friends      = Array.isArray(window.userData.friends)      ? window.userData.friends      : [];
+window.userData.activeCodes  = Array.isArray(window.userData.activeCodes)  ? window.userData.activeCodes  : [];
 window.currentUser = currentUser;
-window.fbAuth = fbAuth;
 window.fbDb = fbDb;
 
-// ── Login ──
+// ── Botón Google ──
 document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
-  if(!fbAuth){ alert('Firebase no configurado aún'); return; }
+  if(!fbAuth){ alert('Firebase no inicializado correctamente'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
     await fbAuth.signInWithPopup(provider);
-  } catch(e) { console.error('Login error:', e); }
-});
-
-document.getElementById('btnLogout').addEventListener('click', () => {
-  window._guestMode = false;
-  if(fbAuth) fbAuth.signOut();
+  } catch(e) {
+    console.error('Login error:', e.code, e.message);
+    alert('Error al iniciar sesión: ' + e.message);
+  }
 });
 
 // ── Botón invitado ──
@@ -5084,6 +5080,12 @@ document.getElementById('btnGuestLogin').addEventListener('click', () => {
   currentUser = null;
   window.currentUser = null;
   mostrarMenuPrincipal();
+});
+
+// ── Logout ──
+document.getElementById('btnLogout').addEventListener('click', () => {
+  window._guestMode = false;
+  if(fbAuth) fbAuth.signOut();
 });
 
 // ── Auth state observer ──
@@ -5097,21 +5099,31 @@ if(fbAuth) {
 
       fbDb.collection('usuarios').doc(user.uid).get().then((doc) => {
           if (doc.exists) {
-              // CARGA REAL DESDE LA NUBE — reemplaza valores locales
+              // CARGA REAL DESDE LA NUBE — sobreescribe valores locales
               const cloudData = doc.data();
-              window.userData.jcPlus         = cloudData.jcPlus         || 0;
-              window.userData.ownedSkins      = cloudData.ownedSkins     || ['default'];
-              window.userData.equippedSkin    = cloudData.equippedSkin   || 'default';
-              window.userData.equippedCupSkin = cloudData.equippedCupSkin|| 'default';
-              window.userData.friends         = cloudData.friends         || [];
-              window.userData.activeCodes     = cloudData.activeCodes     || [];
-              console.log('Sincronización inicial OK:', window.userData.jcPlus);
+              window.userData.jcPlus          = cloudData.jcPlus          || 0;
+              window.userData.ownedSkins       = cloudData.ownedSkins      || ['default'];
+              window.userData.equippedSkin     = cloudData.equippedSkin    || 'default';
+              window.userData.equippedCupSkin  = cloudData.equippedCupSkin || 'default';
+              window.userData.friends          = cloudData.friends          || [];
+              window.userData.activeCodes      = cloudData.activeCodes      || [];
+              console.log('✅ Datos cargados desde Firestore. JC+:', window.userData.jcPlus);
           } else {
-              // Usuario nuevo: registrar en la nube
-              fbDb.collection('usuarios').doc(user.uid).set(window.userData);
+              // Usuario nuevo — crear documento
+              fbDb.collection('usuarios').doc(user.uid).set({
+                nombre:         user.displayName,
+                email:          user.email,
+                jcPlus:         0,
+                ownedSkins:     ['default'],
+                equippedSkin:   'default',
+                equippedCupSkin:'default',
+                friends:        [],
+                activeCodes:    [],
+                creadoEn:       firebase.firestore.FieldValue.serverTimestamp()
+              });
           }
 
-          // Propagar a userData local (fuente de verdad del juego)
+          // Propagar a userData local
           window.userData.skins        = [...window.userData.ownedSkins];
           userData.jcPlus              = window.userData.jcPlus;
           userData.skins               = [...window.userData.ownedSkins];
@@ -5121,8 +5133,9 @@ if(fbAuth) {
           userData.activeCodes         = [...window.userData.activeCodes];
           invincibleMode               = userData.activeCodes.includes('invencible');
 
-          // Forzar UI a mostrar el saldo real recién cargado
+          // Actualizar UI con el saldo real
           actualizarUIPuntos();
+
       }).then(async () => {
         await comprobarBonodiario();
         escucharSolicitudes();
@@ -5132,10 +5145,10 @@ if(fbAuth) {
         console.error('Error cargando datos de Firebase:', e);
         mostrarMenuPrincipal();
       });
+
     } else {
       currentUser = null;
       window.currentUser = null;
-      // Solo redirigir al login si el usuario no eligió modo invitado
       if (!window._guestMode) {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('mainMenu').style.display    = 'none';
@@ -5144,70 +5157,33 @@ if(fbAuth) {
   });
 }
 
-async function cargarDatosUsuario() {
-  if(!fbDb || !currentUser) return;
-  const ref = fbDb.collection('usuarios').doc(currentUser.uid);
-  const snap = await ref.get();    if(snap.exists) {
-    const d = snap.data();
-    // Carga Inicial: Leer de Firebase y asignar a variables globales
-    window.userData.jcPlus = d.jcPlus || 0;
-    window.userData.ownedSkins = d.ownedSkins || d.skins || ['default'];
-    
-    // Sincronizar con el objeto local del juego
-    userData.jcPlus = window.userData.jcPlus;
-    userData.skins = window.userData.ownedSkins;
-    
-    userData.equippedSkin  = d.equippedSkin  || 'default';
-    userData.equippedCupSkin = d.equippedCupSkin || 'default';
-    userData.friends       = d.friends       || [];
-    userData.activeCodes   = d.activeCodes   || [];
-    invincibleMode         = (userData.activeCodes.includes('invencible'));
-    
-    // Forzar actualización visual
-    if(typeof actualizarUIPuntos === 'function') actualizarUIPuntos();
-    actualizarJCDisplay();
-  }else {
-    // Primer login → crear documento
-    await ref.set({
-      nombre: currentUser.displayName,
-      email:  currentUser.email,
-      jcPlus: 200, // bono de bienvenida
-      skins: [], equippedSkin:'default', equippedCupSkin:'default',
-      friends:[], activeCodes:[],
-      ultimoLogin: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    userData.jcPlus = 200;
-    mostrarNotif('🎁 ¡Bienvenido! +200 JC+');
-  }
-  // Bono diario
-  await comprobarBonodiario();
-  // Solicitudes de amistad
-  escucharSolicitudes();
-  // Mensajes JC+ recibidos
-  escucharTransferencias();
-}
-
+// ════════════════════════════════════════════════════════
+//  GUARDAR DATOS
+// ════════════════════════════════════════════════════════
 async function guardarDatosUsuario() {
   if(!fbDb || !currentUser) return;
-  window.userData.jcPlus = userData.jcPlus;
-  window.userData.skins = Array.isArray(userData.skins) ? [...userData.skins] : [];
-  window.userData.ownedSkins = [...window.userData.skins];
-  window.userData.equippedSkin = userData.equippedSkin;
+  window.userData.jcPlus      = userData.jcPlus;
+  window.userData.skins       = Array.isArray(userData.skins) ? [...userData.skins] : [];
+  window.userData.ownedSkins  = [...window.userData.skins];
+  window.userData.equippedSkin    = userData.equippedSkin;
   window.userData.equippedCupSkin = userData.equippedCupSkin;
-  window.userData.friends = Array.isArray(userData.friends) ? [...userData.friends] : [];
+  window.userData.friends     = Array.isArray(userData.friends)     ? [...userData.friends]     : [];
   window.userData.activeCodes = Array.isArray(userData.activeCodes) ? [...userData.activeCodes] : [];
 
   await fbDb.collection('usuarios').doc(currentUser.uid).update({
-    jcPlus:        userData.jcPlus,
-    ownedSkins:    window.userData.ownedSkins,
-    skins:         userData.skins,
-    equippedSkin:  userData.equippedSkin,
+    jcPlus:          userData.jcPlus,
+    ownedSkins:      window.userData.ownedSkins,
+    skins:           userData.skins,
+    equippedSkin:    userData.equippedSkin,
     equippedCupSkin: userData.equippedCupSkin,
-    friends:       userData.friends,
-    activeCodes:   userData.activeCodes,
+    friends:         userData.friends,
+    activeCodes:     userData.activeCodes,
   });
 }
 
+// ════════════════════════════════════════════════════════
+//  BONO DIARIO
+// ════════════════════════════════════════════════════════
 async function comprobarBonodiario() {
   if(!fbDb || !currentUser) return;
   const ref = fbDb.collection('usuarios').doc(currentUser.uid);
@@ -5216,40 +5192,44 @@ async function comprobarBonodiario() {
   const hoy = new Date();
   if(hoy.toDateString() !== ultimo.toDateString()){
     userData.jcPlus += 200;
+    window.userData.jcPlus = userData.jcPlus;
     await ref.update({ jcPlus: userData.jcPlus, ultimoLogin: firebase.firestore.FieldValue.serverTimestamp() });
     mostrarNotif('🎁 +200 JC+ bono diario');
+    actualizarUIPuntos();
   }
 }
 
+// ════════════════════════════════════════════════════════
+//  MENÚ PRINCIPAL — con soporte invitado
+// ════════════════════════════════════════════════════════
 function mostrarMenuPrincipal() {
-  const menu = document.getElementById('mainMenu');
-  menu.style.display = 'flex';
+  document.getElementById('mainMenu').style.display = 'flex';
   document.getElementById('loginScreen').style.display = 'none';
 
   if (currentUser) {
-    // Usuario autenticado
-    const avatarEl = document.getElementById('userAvatar');
-    if(avatarEl) { avatarEl.src = currentUser.photoURL || ''; avatarEl.style.display = 'block'; }
+    const av = document.getElementById('userAvatar');
+    if(av){ av.src = currentUser.photoURL || ''; av.style.display = 'block'; }
     document.getElementById('userNameDisplay').textContent = currentUser.displayName || 'Jugador';
     document.getElementById('jcPlusDisplay').style.display = 'block';
     document.getElementById('btnLogout').style.display = 'inline-block';
-    document.getElementById('btnLoginFromMenu').style.display = 'none';
-    const jcSaveNote = document.getElementById('jcPlusSaveNote');
-    if(jcSaveNote) jcSaveNote.style.display = 'block';
-    const guestNote = document.getElementById('guestNote');
-    if(guestNote) guestNote.style.display = 'none';
+    const btnL = document.getElementById('btnLoginFromMenu');
+    if(btnL) btnL.style.display = 'none';
+    const jcNote = document.getElementById('jcPlusSaveNote');
+    if(jcNote) jcNote.style.display = 'block';
+    const gNote = document.getElementById('guestNote');
+    if(gNote) gNote.style.display = 'none';
   } else {
-    // Invitado
-    const avatarEl = document.getElementById('userAvatar');
-    if(avatarEl) { avatarEl.src = ''; avatarEl.style.display = 'none'; }
+    const av = document.getElementById('userAvatar');
+    if(av){ av.src = ''; av.style.display = 'none'; }
     document.getElementById('userNameDisplay').textContent = '👤 Invitado';
     document.getElementById('jcPlusDisplay').style.display = 'none';
     document.getElementById('btnLogout').style.display = 'none';
-    document.getElementById('btnLoginFromMenu').style.display = 'inline-block';
-    const jcSaveNote = document.getElementById('jcPlusSaveNote');
-    if(jcSaveNote) jcSaveNote.style.display = 'none';
-    const guestNote = document.getElementById('guestNote');
-    if(guestNote) guestNote.style.display = 'block';
+    const btnL = document.getElementById('btnLoginFromMenu');
+    if(btnL) btnL.style.display = 'inline-block';
+    const jcNote = document.getElementById('jcPlusSaveNote');
+    if(jcNote) jcNote.style.display = 'none';
+    const gNote = document.getElementById('guestNote');
+    if(gNote) gNote.style.display = 'block';
   }
 
   actualizarJCDisplay();
@@ -5265,9 +5245,9 @@ function mostrarPantallaLogin() {
 }
 
 function actualizarJCDisplay() {
-  // Sincronización del HUD: Siempre usa window.userData.jcPlus para mostrar las monedas
-  const currentPoints = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : userData.jcPlus;
-  document.getElementById('jcPlusDisplay').textContent = `${currentPoints} JC+`;
+  const pts = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : 0;
+  const el = document.getElementById('jcPlusDisplay');
+  if(el) el.textContent = pts + ' JC+';
   if(typeof window.actualizarUIPuntos === 'function') window.actualizarUIPuntos();
 }
 
@@ -5284,77 +5264,6 @@ function irAJugar() {
   document.getElementById('mainMenu').style.display = 'none';
   startScreen.style.display = 'flex';
 }
-
-// ════════════════════════════════════════════════════════
-//  SKINS — 30 PERSONAJE + 30 TAZA
-// ════════════════════════════════════════════════════════
-const SKINS_PERSONAJE = [
-  {id:'default',  name:'Oficinista',   price:0,    colors:['#2244bb','#223344','#fff']},
-  {id:'rojo',     name:'Rojo Fuego',   price:200,  colors:['#cc2200','#441100','#ffaa88']},
-  {id:'verde',    name:'Comando',      price:200,  colors:['#226622','#112211','#aaffaa']},
-  {id:'dorado',   name:'Dorado',       price:500,  colors:['#ccaa00','#443300','#ffeeaa']},
-  {id:'negro',    name:'Sombra',       price:300,  colors:['#111111','#000000','#aaaaaa']},
-  {id:'morado',   name:'Púrpura',      price:300,  colors:['#662299','#220044','#ddaaff']},
-  {id:'cyan',     name:'Cian',         price:300,  colors:['#00aacc','#002244','#aaeeff']},
-  {id:'rosa',     name:'Rosa',         price:300,  colors:['#cc4488','#440022','#ffaacc']},
-  {id:'naranja',  name:'Naranja',      price:300,  colors:['#cc6600','#441100','#ffcc88']},
-  {id:'blanco',   name:'Fantasma',     price:400,  colors:['#dddddd','#888888','#ffffff']},
-  {id:'militar',  name:'Militar',      price:400,  colors:['#556633','#334422','#99aa66']},
-  {id:'robot',    name:'Robot',        price:600,  colors:['#667788','#334455','#aabbcc']},
-  {id:'ninja',    name:'Ninja',        price:600,  colors:['#222222','#111111','#555555']},
-  {id:'pirata',   name:'Pirata',       price:500,  colors:['#884422','#441100','#ffcc66']},
-  {id:'zombie',   name:'Zombie',       price:700,  colors:['#556633','#334422','#99cc55']},
-  {id:'fantasma', name:'Espectro',     price:700,  colors:['#8899aa','#445566','#ccdde']},
-  {id:'fuego',    name:'Llamas',       price:800,  colors:['#cc4400','#882200','#ffaa00']},
-  {id:'hielo',    name:'Hielo',        price:800,  colors:['#4488cc','#224466','#aaddff']},
-  {id:'veneno',   name:'Tóxico',       price:800,  colors:['#44cc22','#226611','#aaff66']},
-  {id:'rey',      name:'Rey',          price:1000, colors:['#ccaa00','#885500','#ffdd55']},
-  {id:'invisible',name:'Invisible',    price:1000, colors:['rgba(255,255,255,0.15)','rgba(0,0,0,0.1)','rgba(255,255,255,0.3)']},
-  {id:'demonio',  name:'Demonio',      price:1000, colors:['#880000','#440000','#ff4422']},
-  {id:'angel',    name:'Ángel',        price:1000, colors:['#ffffff','#ddddff','#ffffcc']},
-  {id:'pikachu',  name:'Amarillo ⚡',  price:1200, colors:['#ffcc00','#cc8800','#ffffaa']},
-  {id:'dino',     name:'Dinosaurio',   price:1200, colors:['#33aa44','#116622','#88ffaa']},
-  {id:'astronauta',name:'Astronauta',  price:1500, colors:['#ffffff','#aaaaaa','#dddddd']},
-  {id:'vikingo',  name:'Vikingo',      price:1500, colors:['#cc8844','#664422','#ffddaa']},
-  {id:'samurai',  name:'Samurai',      price:1500, colors:['#cc2222','#441111','#ff8888']},
-  {id:'bruja',    name:'Bruja',        price:1500, colors:['#442266','#221133','#aa44ff']},
-  {id:'leyenda',  name:'Leyenda ✨',   price:3000, colors:['#ffcc44','#ff8800','#ffffff']},
-];
-
-const SKINS_TAZA = [
-  {id:'default',  name:'Taza Normal',  price:0,    color:'#eee',  liquid:'#5c3317'},
-  {id:'dorada',   name:'Taza Dorada',  price:300,  color:'#ffcc44',liquid:'#aa7700'},
-  {id:'roja',     name:'Taza Roja',    price:200,  color:'#cc2200',liquid:'#440000'},
-  {id:'azul',     name:'Taza Azul',    price:200,  color:'#2266cc',liquid:'#112244'},
-  {id:'verde',    name:'Taza Verde',   price:200,  color:'#22aa44',liquid:'#115522'},
-  {id:'negra',    name:'Taza Negra',   price:300,  color:'#222222',liquid:'#000000'},
-  {id:'arcoiris', name:'Arcoíris',     price:500,  color:'#ff44aa',liquid:'#8800cc'},
-  {id:'fuego',    name:'Taza Fuego',   price:600,  color:'#ff6600',liquid:'#cc2200'},
-  {id:'hielo',    name:'Taza Hielo',   price:600,  color:'#aaddff',liquid:'#4488cc'},
-  {id:'veneno',   name:'Taza Tóxica',  price:600,  color:'#44ff22',liquid:'#226611'},
-  {id:'cristal',  name:'Cristal',      price:800,  color:'rgba(200,220,255,0.6)',liquid:'rgba(100,150,255,0.5)'},
-  {id:'lava',     name:'Lava',         price:800,  color:'#ff4400',liquid:'#cc2200'},
-  {id:'sangre',   name:'Sangre',       price:800,  color:'#880000',liquid:'#440000'},
-  {id:'galaxy',   name:'Galaxia',      price:1000, color:'#220044',liquid:'#8800ff'},
-  {id:'oro_solido',name:'Oro Sólido',  price:1000, color:'#ddaa00',liquid:'#886600'},
-  {id:'platino',  name:'Platino',      price:1200, color:'#ccccdd',liquid:'#8888aa'},
-  {id:'diamante', name:'Diamante 💎',  price:1500, color:'#aaddff',liquid:'#66aaff'},
-  {id:'magica',   name:'Mágica ✨',    price:1500, color:'#ff88ff',liquid:'#aa00aa'},
-  {id:'bomba',    name:'Bomba 💣',     price:1200, color:'#333333',liquid:'#ff4400'},
-  {id:'calavera', name:'Calavera 💀',  price:1200, color:'#dddddd',liquid:'#888888'},
-  {id:'pirata',   name:'Pirata',       price:1000, color:'#884422',liquid:'#cc6600'},
-  {id:'ninja',    name:'Ninja',        price:1000, color:'#222222',liquid:'#444444'},
-  {id:'robot',    name:'Robot 🤖',     price:1000, color:'#667788',liquid:'#334455'},
-  {id:'zombie',   name:'Zombie 🧟',    price:1200, color:'#556633',liquid:'#99cc55'},
-  {id:'angel',    name:'Ángel 😇',     price:1500, color:'#ffffee',liquid:'#ffdd88'},
-  {id:'demonio',  name:'Demonio 😈',   price:1500, color:'#660000',liquid:'#ff2200'},
-  {id:'astro',    name:'Astronauta 🚀',price:2000, color:'#dddddd',liquid:'#4488cc'},
-  {id:'dragón',   name:'Dragón 🐉',    price:2000, color:'#cc4400',liquid:'#ff8800'},
-  {id:'unicornio',name:'Unicornio 🦄', price:2000, color:'#ffaaee',liquid:'#cc44ff'},
-  {id:'leyenda',  name:'Taza Leyenda ✨',price:3000,color:'#ffcc44',liquid:'#ff6600'},
-];
-
-let currentSkinTab = 'personaje';
 
 function switchSkinTab(tab) {
   currentSkinTab = tab;
@@ -5423,7 +5332,7 @@ window.actualizarUIPuntos = function actualizarUIPuntos() {
   if(shopPointsEl) shopPointsEl.textContent = `🪙 ${puntosActuales} JC+`;
 };
 
-// Sobrescribir comprarSkinSeguro para manejar equipamiento y UI
+// comprarSkinSeguro — con bloqueo para invitados
 (function() {
     const originalComprarSkinSeguro = window.comprarSkinSeguro;
     window.comprarSkinSeguro = async function(skinId, precio, tipo, owned) {
@@ -5432,17 +5341,10 @@ window.actualizarUIPuntos = function actualizarUIPuntos() {
           ? owned
           : (precio === 0 || userData.skins.includes(skinId));
 
-        // BLOQUEO INVITADO: solo al intentar comprar (no equipar gratis)
+        // BLOQUEO INVITADO
         if (!currentUser && precio > 0 && !ownedReal) {
-            if(typeof window.mostrarNotif === 'function') {
-                window.mostrarNotif("🔑 Inicia sesión para comprar skins");
-            } else {
-                alert("Tienes que iniciar sesión para poder comprar.");
-            }
-            // Ofrecer ir al login
-            setTimeout(() => {
-                if(confirm("¿Quieres iniciar sesión ahora?")) mostrarPantallaLogin();
-            }, 300);
+            mostrarNotif('🔑 Inicia sesión para comprar skins');
+            setTimeout(() => { if(confirm('¿Quieres iniciar sesión ahora?')) mostrarPantallaLogin(); }, 300);
             return;
         }
 
@@ -5786,49 +5688,57 @@ function mostrarNotif(msg, dur=3000) {
   setTimeout(()=>el.style.display='none', dur);
 }
 
+
 // ════════════════════════════════════════════════════════
-//  VOLVER AL MENÚ AL TERMINAR PARTIDA
+//  SINCRONIZACIÓN GLOBAL DE PUNTOS CON FIREBASE
 // ════════════════════════════════════════════════════════
-// Hook endGame: chat + botón menú (el guardado Firebase ya está dentro de endGame())
+window.sincronizarPuntosConNube = async function(puntosAdicionales) {
+    if (!window.currentUser || !window.fbDb) return;
+    if (!puntosAdicionales || puntosAdicionales <= 0) return;
+    try {
+        window.userData.jcPlus = (window.userData.jcPlus || 0) + puntosAdicionales;
+        userData.jcPlus = window.userData.jcPlus;
+        await window.fbDb.collection('usuarios').doc(window.currentUser.uid).update({
+            jcPlus: window.userData.jcPlus,
+            lastSync: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log('☁️ Sincronizado +' + puntosAdicionales + ' JC+ → total:', window.userData.jcPlus);
+        if(typeof actualizarUIPuntos === 'function') actualizarUIPuntos();
+        if(typeof actualizarJCDisplay === 'function') actualizarJCDisplay();
+        mostrarNotif('☁️ +' + puntosAdicionales + ' JC+ guardados');
+    } catch(e) {
+        console.error('Error sincronizando Firebase:', e);
+    }
+};
+
+window.actualizarUIPuntos = function() {
+  const pts = (window.userData && window.userData.jcPlus !== undefined) ? window.userData.jcPlus : 0;
+  const menuEl = document.getElementById('jcPlusDisplay');
+  if(menuEl) menuEl.textContent = pts + ' JC+';
+  if(typeof shopPointsEl !== 'undefined' && shopPointsEl) shopPointsEl.textContent = '🪙 ' + pts + ' JC+';
+};
+
+// Botón 🏠 MENÚ en pantalla de game over (para usuarios e invitados)
 window.addEventListener('load', () => {
-  const _origEndGame2 = window.endGame;
+  const _orig = window.endGame;
   window.endGame = function() {
-    _origEndGame2();
-    mostrarChatBoton(false);
-    setTimeout(()=>{
-      if(document.getElementById('gameOverScreen').style.display!=='none'){
-        const btn = document.getElementById('gameOverScreen').querySelector('.btn');
-        if(btn && !document.getElementById('btnVolverMenu')){
+    _orig();
+    if(typeof mostrarChatBoton === 'function') mostrarChatBoton(false);
+    setTimeout(() => {
+      const screen = document.getElementById('gameOverScreen');
+      if(screen && screen.style.display !== 'none') {
+        const btn = screen.querySelector('.btn');
+        if(btn && !document.getElementById('btnVolverMenu')) {
           const b2 = document.createElement('button');
-          b2.id='btnVolverMenu'; b2.className='btn'; b2.textContent='🏠 MENÚ';
-          b2.style.marginTop='8px'; b2.style.background='#1a1a2e';
-          b2.addEventListener('click',()=>{ document.getElementById('gameOverScreen').style.display='none'; mostrarMenuPrincipal(); });
+          b2.id = 'btnVolverMenu'; b2.className = 'btn'; b2.textContent = '🏠 MENÚ';
+          b2.style.cssText = 'margin-top:8px;background:#1a1a2e;';
+          b2.onclick = () => { screen.style.display = 'none'; mostrarMenuPrincipal(); };
           btn.parentNode.appendChild(b2);
         }
       }
     }, 100);
   };
 });
-
-    // === FIREBASE SYNC — función global con parámetro explícito ===
-    window.sincronizarPuntosConNube = async function(puntosAdicionales) {
-        if (!window.currentUser || !window.fbDb) return;
-        if (!puntosAdicionales || puntosAdicionales <= 0) return;
-        try {
-            window.userData.jcPlus = (window.userData.jcPlus || 0) + puntosAdicionales;
-            userData.jcPlus = window.userData.jcPlus;
-            await window.fbDb.collection('usuarios').doc(window.currentUser.uid).update({
-                jcPlus: window.userData.jcPlus,
-                lastSync: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            console.log('☁️ Sincronizado +' + puntosAdicionales + ' JC+ → total:', window.userData.jcPlus);
-            if(typeof actualizarUIPuntos === 'function') actualizarUIPuntos();
-            if(typeof actualizarJCDisplay === 'function') actualizarJCDisplay();
-            mostrarNotif('☁️ +' + puntosAdicionales + ' JC+ guardados en la nube');
-        } catch(e) {
-            console.error('Error sincronizando Firebase:', e);
-        }
-    };
 </script>
 </body>
 </html>
